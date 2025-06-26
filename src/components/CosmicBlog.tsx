@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Eye, Lock, Star, Plus, Edit } from 'lucide-react';
+import { Eye, Lock, Star, Plus, Edit, LogOut } from 'lucide-react';
 import BlogPost from './BlogPost';
 import AdminPanel from './AdminPanel';
 
@@ -16,28 +16,27 @@ const CosmicBlog: React.FC<CosmicBlogProps> = ({ userClearance, onLogout }) => {
   const [showAdminPanel, setShowAdminPanel] = useState(false);
 
   useEffect(() => {
-    // Load initial demo posts
     const demoPosts = [
       {
         id: '1',
-        title: 'Welcome to the Cosmic Realm',
-        content: 'Greetings, fellow travelers of the digital cosmos! This is a public transmission visible to all who enter our realm. The stars align to bring you stories from across the galaxy.',
-        author: 'Cosmic Admin',
+        title: 'Welcome to Our Digital Sanctuary',
+        content: 'Step into a world where thoughts flow freely and ideas take shape. This is your gateway to curated content, designed with intention and crafted with care. Every post here tells a story, shares an insight, or opens a door to new possibilities.',
+        author: 'Content Curator',
         date: new Date().toISOString(),
         clearanceLevel: 'public' as const
       },
       {
         id: '2',
-        title: 'Secret Friend Gathering',
-        content: 'Hey friends! 🌟 This message is for those with friend clearance. We\'re planning something special under the constellation of Andromeda. The stardust whispers secrets only we can hear.',
-        author: 'Stellar Friend',
+        title: 'Exclusive Insights for Friends',
+        content: 'Welcome to the inner circle! Here we share deeper thoughts, behind-the-scenes glimpses, and exclusive content meant for those who\'ve earned our trust. Thank you for being part of this special community where authentic connections flourish.',
+        author: 'Community Manager',
         date: new Date(Date.now() - 86400000).toISOString(),
         clearanceLevel: 'friend' as const
       },
       {
         id: '3',
-        title: 'Admin Protocol: Galaxy Maintenance',
-        content: 'CLASSIFIED: Weekly maintenance of the cosmic database. All quantum pathways will be recalibrated at 0300 GMT. Backup protocols are in effect. Remember: with great power comes great responsibility in the digital cosmos.',
+        title: 'Admin Protocol: System Updates',
+        content: 'Internal memo: All systems are operating at optimal performance. User engagement metrics show positive trends across all clearance levels. Remember to maintain content quality and ensure appropriate access controls are in place.',
         author: 'System Administrator',
         date: new Date(Date.now() - 172800000).toISOString(),
         clearanceLevel: 'admin' as const
@@ -74,7 +73,7 @@ const CosmicBlog: React.FC<CosmicBlogProps> = ({ userClearance, onLogout }) => {
   };
 
   const handleDeletePost = (postId: string) => {
-    if (confirm('Are you sure you want to delete this transmission?')) {
+    if (confirm('Are you sure you want to delete this post?')) {
       const updatedPosts = posts.filter(post => post.id !== postId);
       savePosts(updatedPosts);
     }
@@ -87,87 +86,55 @@ const CosmicBlog: React.FC<CosmicBlogProps> = ({ userClearance, onLogout }) => {
 
   const getClearanceIcon = (level: string) => {
     switch (level) {
-      case 'admin': return <Lock className="w-5 h-5 text-red-400" />;
-      case 'friend': return <Star className="w-5 h-5 text-yellow-400" />;
-      default: return <Eye className="w-5 h-5 text-green-400" />;
+      case 'admin': return <Lock className="w-5 h-5 text-red-500" />;
+      case 'friend': return <Star className="w-5 h-5 text-amber-500" />;
+      default: return <Eye className="w-5 h-5 text-blue-500" />;
     }
   };
 
   const getClearanceName = (level: string) => {
     switch (level) {
-      case 'admin': return 'COSMIC ADMIN';
-      case 'friend': return 'STELLAR FRIEND';
-      default: return 'SPACE VISITOR';
+      case 'admin': return 'Administrator';
+      case 'friend': return 'Trusted Friend';
+      default: return 'Guest';
     }
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden grain">
-      {/* Animated background */}
-      <div className="absolute inset-0 overflow-hidden">
-        {[...Array(30)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute rounded-full twinkle-star"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              width: `${Math.random() * 3 + 1}px`,
-              height: `${Math.random() * 3 + 1}px`,
-              backgroundColor: ['#00ff88', '#ff0088', '#0088ff', '#ffff00', '#ff8800'][Math.floor(Math.random() * 5)],
-              animationDelay: `${Math.random() * 5}s`
-            }}
-          />
-        ))}
-        
-        {[...Array(8)].map((_, i) => (
-          <div
-            key={`blob-${i}`}
-            className="absolute floating-blob opacity-10"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              width: `${Math.random() * 300 + 150}px`,
-              height: `${Math.random() * 300 + 150}px`,
-              background: `radial-gradient(circle, ${['#ff00ff', '#00ffff', '#ffff00', '#ff8800', '#8800ff'][Math.floor(Math.random() * 5)]}15 0%, transparent 70%)`,
-              borderRadius: '50%',
-              animationDelay: `${Math.random() * 8}s`
-            }}
-          />
-        ))}
-      </div>
-
-      <div className="relative z-10 container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100">
+      <div className="max-w-4xl mx-auto px-6 py-8">
         {/* Header */}
-        <header className="glass rounded-2xl p-6 mb-8 border border-purple-500/30 shadow-lg">
+        <header className="apple-card p-6 mb-8 animate-fade-up">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-400 via-cyan-400 to-green-400 bg-clip-text text-transparent font-space typewriter">
-                COSMIC TRANSMISSIONS
+              <h1 className="text-4xl font-bold text-gray-900 mb-2">
+                Digital Journal
               </h1>
-              <p className="text-gray-400 mt-2 font-code">
-                Broadcasting from the edge of the digital galaxy
+              <p className="text-gray-600">
+                Thoughtfully curated content for every clearance level
               </p>
             </div>
             
             <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2 px-4 py-2 glass rounded-lg border border-gray-600">
+              <div className="flex items-center gap-3 px-4 py-2 bg-gray-50 rounded-2xl">
                 {getClearanceIcon(userClearance)}
-                <span className="font-code text-sm">{getClearanceName(userClearance)}</span>
+                <span className="font-medium text-gray-700 text-sm">
+                  {getClearanceName(userClearance)}
+                </span>
               </div>
               
               {userClearance === 'admin' && (
                 <div className="flex space-x-2">
                   <button
                     onClick={() => setIsEditMode(!isEditMode)}
-                    className={`px-4 py-2 rounded-lg font-code text-sm transition-all ${
+                    className={`px-4 py-2 rounded-2xl font-medium text-sm transition-all apple-button ${
                       isEditMode 
-                        ? 'bg-orange-600 text-white' 
-                        : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                        ? 'bg-orange-500 text-white shadow-lg' 
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
                   >
                     <Edit className="w-4 h-4 inline mr-2" />
-                    {isEditMode ? 'EXIT EDIT' : 'EDIT MODE'}
+                    {isEditMode ? 'Exit Edit' : 'Edit Mode'}
                   </button>
                   
                   <button
@@ -175,19 +142,20 @@ const CosmicBlog: React.FC<CosmicBlogProps> = ({ userClearance, onLogout }) => {
                       setShowAdminPanel(!showAdminPanel);
                       setEditingPost(null);
                     }}
-                    className="px-4 py-2 bg-gradient-to-r from-purple-600 to-cyan-600 text-white rounded-lg font-code text-sm hover:from-purple-700 hover:to-cyan-700 transition-all"
+                    className="px-4 py-2 bg-blue-500 text-white rounded-2xl font-medium text-sm apple-button"
                   >
                     <Plus className="w-4 h-4 inline mr-2" />
-                    NEW POST
+                    New Post
                   </button>
                 </div>
               )}
               
               <button
                 onClick={onLogout}
-                className="px-4 py-2 bg-red-600/20 text-red-400 rounded-lg hover:bg-red-600/30 transition-colors font-code text-sm"
+                className="p-2 text-gray-500 hover:text-red-500 hover:bg-red-50 rounded-2xl transition-all apple-button"
+                title="Sign out"
               >
-                LOGOUT
+                <LogOut className="w-5 h-5" />
               </button>
             </div>
           </div>
@@ -195,7 +163,7 @@ const CosmicBlog: React.FC<CosmicBlogProps> = ({ userClearance, onLogout }) => {
 
         {/* Admin Panel */}
         {showAdminPanel && userClearance === 'admin' && (
-          <div className="mb-8">
+          <div className="mb-8 animate-scale-in">
             <AdminPanel
               onCreatePost={handleCreatePost}
               onUpdatePost={handleUpdatePost}
@@ -209,35 +177,41 @@ const CosmicBlog: React.FC<CosmicBlogProps> = ({ userClearance, onLogout }) => {
         )}
 
         {/* Blog Posts */}
-        <div className="space-y-8">
+        <div className="space-y-6">
           {posts.length === 0 ? (
-            <div className="glass rounded-2xl p-12 text-center border border-gray-600">
-              <Star className="w-12 h-12 text-gray-500 mx-auto mb-4" />
-              <p className="text-gray-400 font-code">No transmissions detected in this sector...</p>
+            <div className="apple-card p-12 text-center animate-fade-up">
+              <Star className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+              <p className="text-gray-600 font-medium">No posts yet</p>
+              <p className="text-gray-500 text-sm mt-1">Check back soon for new content</p>
             </div>
           ) : (
-            posts.map((post) => (
-              <BlogPost
+            posts.map((post, index) => (
+              <div
                 key={post.id}
-                post={post}
-                userClearance={userClearance}
-                isEditMode={isEditMode}
-                onEdit={handleEditPost}
-                onDelete={handleDeletePost}
-              />
+                className="animate-fade-up"
+                style={{ animationDelay: `${index * 0.1}s` }}
+              >
+                <BlogPost
+                  post={post}
+                  userClearance={userClearance}
+                  isEditMode={isEditMode}
+                  onEdit={handleEditPost}
+                  onDelete={handleDeletePost}
+                />
+              </div>
             ))
           )}
         </div>
 
         {/* Footer */}
-        <footer className="mt-16 text-center text-gray-500 font-code text-sm">
-          <p>🌌 Powered by cosmic energy and digital stardust 🌌</p>
-          <p className="mt-2">
+        <footer className="mt-16 text-center text-gray-500 text-sm">
+          <p className="mb-2">
             {posts.filter(post => {
               const clearanceLevels = { public: 0, friend: 1, admin: 2 };
               return clearanceLevels[userClearance] >= clearanceLevels[post.clearanceLevel];
-            }).length} transmissions accessible with your clearance level
+            }).length} posts accessible with your current clearance
           </p>
+          <p>Designed with care and attention to detail</p>
         </footer>
       </div>
     </div>

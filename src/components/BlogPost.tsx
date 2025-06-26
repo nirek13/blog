@@ -1,6 +1,7 @@
 
 import React from 'react';
-import { Eye, Lock, Star } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Eye, Lock, Star, Edit, Trash2 } from 'lucide-react';
 
 interface BlogPostProps {
   post: {
@@ -24,6 +25,8 @@ const BlogPost: React.FC<BlogPostProps> = ({
   onEdit, 
   onDelete 
 }) => {
+  const navigate = useNavigate();
+
   const canView = () => {
     const clearanceLevels = { public: 0, friend: 1, admin: 2 };
     return clearanceLevels[userClearance] >= clearanceLevels[post.clearanceLevel];
@@ -31,75 +34,90 @@ const BlogPost: React.FC<BlogPostProps> = ({
 
   const getClearanceIcon = (level: string) => {
     switch (level) {
-      case 'admin': return <Lock className="w-4 h-4 text-red-400" />;
-      case 'friend': return <Star className="w-4 h-4 text-yellow-400" />;
-      default: return <Eye className="w-4 h-4 text-green-400" />;
+      case 'admin': return <Lock className="w-4 h-4 text-red-500" />;
+      case 'friend': return <Star className="w-4 h-4 text-amber-500" />;
+      default: return <Eye className="w-4 h-4 text-blue-500" />;
     }
   };
 
   const getClearanceColor = (level: string) => {
     switch (level) {
-      case 'admin': return 'border-red-500/50 shadow-red-500/20';
-      case 'friend': return 'border-yellow-500/50 shadow-yellow-500/20';
-      default: return 'border-green-500/50 shadow-green-500/20';
+      case 'admin': return 'bg-red-50 text-red-700 border-red-200';
+      case 'friend': return 'bg-amber-50 text-amber-700 border-amber-200';
+      default: return 'bg-blue-50 text-blue-700 border-blue-200';
     }
+  };
+
+  const handleClick = () => {
+    if (!isEditMode && canView()) {
+      navigate(`/post/${post.id}`);
+    }
+  };
+
+  const handleEdit = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onEdit?.(post);
+  };
+
+  const handleDelete = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onDelete?.(post.id);
   };
 
   if (!canView()) {
     return (
-      <div className="glass rounded-2xl p-6 border border-gray-500/30 opacity-50">
-        <div className="flex items-center justify-center space-x-2 text-gray-500">
+      <div className="post-card p-6 opacity-60 cursor-not-allowed">
+        <div className="flex items-center justify-center space-x-3 text-gray-500 mb-4">
           <Lock className="w-6 h-6" />
-          <span className="font-code">CLASSIFIED CONTENT</span>
+          <span className="font-medium">Restricted Content</span>
         </div>
-        <p className="text-center text-sm text-gray-600 mt-2">
-          Clearance level insufficient for this transmission
+        <p className="text-center text-sm text-gray-500">
+          Insufficient clearance level
         </p>
       </div>
     );
   }
 
   return (
-    <article className={`glass rounded-2xl p-6 border ${getClearanceColor(post.clearanceLevel)} shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]`}>
+    <article 
+      className={`post-card p-6 ${!isEditMode ? 'cursor-pointer' : ''}`}
+      onClick={handleClick}
+    >
       <div className="flex items-start justify-between mb-4">
-        <div className="flex items-center space-x-2">
+        <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium border ${getClearanceColor(post.clearanceLevel)}`}>
           {getClearanceIcon(post.clearanceLevel)}
-          <span className="text-xs font-code uppercase tracking-wider text-gray-400">
-            {post.clearanceLevel} clearance
-          </span>
+          <span className="capitalize">{post.clearanceLevel}</span>
         </div>
         
         {isEditMode && userClearance === 'admin' && (
           <div className="flex space-x-2">
             <button
-              onClick={() => onEdit?.(post)}
-              className="px-3 py-1 bg-blue-600/20 text-blue-400 rounded-lg hover:bg-blue-600/30 transition-colors text-sm font-code"
+              onClick={handleEdit}
+              className="p-2 text-blue-500 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-colors apple-button"
             >
-              EDIT
+              <Edit className="w-4 h-4" />
             </button>
             <button
-              onClick={() => onDelete?.(post.id)}
-              className="px-3 py-1 bg-red-600/20 text-red-400 rounded-lg hover:bg-red-600/30 transition-colors text-sm font-code"
+              onClick={handleDelete}
+              className="p-2 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-xl transition-colors apple-button"
             >
-              DELETE
+              <Trash2 className="w-4 h-4" />
             </button>
           </div>
         )}
       </div>
 
-      <h2 className="text-2xl font-bold text-white mb-3 font-space">
+      <h2 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2">
         {post.title}
       </h2>
 
-      <div className="prose prose-invert max-w-none mb-4">
-        <div className="text-gray-300 leading-relaxed whitespace-pre-wrap">
-          {post.content}
-        </div>
+      <div className="text-gray-600 mb-4 line-clamp-3 leading-relaxed">
+        {post.content}
       </div>
 
-      <div className="flex items-center justify-between text-sm text-gray-500 border-t border-gray-700 pt-4">
-        <span className="font-code">BY {post.author.toUpperCase()}</span>
-        <time className="font-code">{new Date(post.date).toLocaleDateString()}</time>
+      <div className="flex items-center justify-between text-sm text-gray-500 pt-4 border-t border-gray-100">
+        <span className="font-medium">{post.author}</span>
+        <time>{new Date(post.date).toLocaleDateString()}</time>
       </div>
     </article>
   );
