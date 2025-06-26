@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Lock, Eye, Star } from 'lucide-react';
 import PasswordGate from '../components/PasswordGate';
+import CommentSystem from '../components/CommentSystem';
 
 const PostDetail = () => {
   const { slug } = useParams();
@@ -46,12 +47,12 @@ const PostDetail = () => {
 
   if (!post) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-semibold text-gray-900 mb-4">Post not found</h1>
           <button
             onClick={() => navigate('/')}
-            className="px-6 py-3 bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition-colors"
+            className="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors focus-ring"
           >
             Go back home
           </button>
@@ -62,14 +63,14 @@ const PostDetail = () => {
 
   if (!canView()) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="max-w-md mx-auto p-8 bg-white rounded-3xl shadow-lg text-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="max-w-md mx-auto p-8 text-center">
           <Lock className="w-12 h-12 text-gray-400 mx-auto mb-4" />
           <h1 className="text-xl font-semibold text-gray-900 mb-2">Access Restricted</h1>
           <p className="text-gray-600 mb-6">You don't have sufficient clearance to view this content.</p>
           <button
             onClick={() => navigate('/')}
-            className="px-6 py-3 bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition-colors"
+            className="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors focus-ring"
           >
             Go back home
           </button>
@@ -79,54 +80,54 @@ const PostDetail = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-4xl mx-auto px-6 py-8">
+    <div className="min-h-screen bg-white">
+      <div className="max-w-2xl mx-auto px-6 py-12">
         {/* Header */}
         <div className="mb-8">
           <button
             onClick={() => navigate('/')}
-            className="flex items-center gap-2 text-blue-500 hover:text-blue-600 transition-colors mb-6 group"
+            className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors mb-8 focus-ring rounded-lg p-1 -ml-1"
           >
-            <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-            Back to feed
+            <ArrowLeft className="w-4 h-4" />
+            <span className="text-sm">Back</span>
           </button>
         </div>
 
         {/* Post Content */}
-        <article className="bg-white rounded-3xl shadow-sm border border-gray-200 overflow-hidden">
-          {/* Post Header */}
-          <div className="px-8 py-6 border-b border-gray-100">
-            <div className="flex items-center gap-2 mb-4">
-              {getClearanceIcon(post.clearanceLevel)}
-              <span className="text-sm font-medium text-gray-600 capitalize">
-                {post.clearanceLevel} access
-              </span>
-            </div>
-            
-            <h1 className="text-3xl font-bold text-gray-900 mb-4 leading-tight">
-              {post.title}
-            </h1>
-            
-            <div className="flex items-center justify-between text-sm text-gray-500">
-              <span className="font-medium">{post.author}</span>
-              <time>{new Date(post.date).toLocaleDateString('en-US', { 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
-              })}</time>
-            </div>
+        <article className="animate-fade-in">
+          {/* Post Meta */}
+          <div className="flex items-center space-x-2 mb-6">
+            {getClearanceIcon(post.clearanceLevel)}
+            <span className="text-xs text-gray-500 uppercase tracking-wide">
+              {post.clearanceLevel}
+            </span>
+          </div>
+          
+          <h1 className="text-3xl font-semibold text-gray-900 mb-6 leading-tight">
+            {post.title}
+          </h1>
+          
+          <div className="flex items-center space-x-4 text-sm text-gray-500 mb-8">
+            <span>{post.author}</span>
+            <span>•</span>
+            <time>{new Date(post.date).toLocaleDateString('en-US', { 
+              year: 'numeric', 
+              month: 'long', 
+              day: 'numeric' 
+            })}</time>
           </div>
 
           {/* Post Body */}
-          <div className="px-8 py-8">
-            <div className="prose prose-lg max-w-none text-gray-700 leading-relaxed">
-              {post.content.split('\n').map((paragraph: string, index: number) => (
-                <p key={index} className="mb-4 last:mb-0">
-                  {paragraph}
-                </p>
-              ))}
-            </div>
+          <div className="prose prose-lg max-w-none text-gray-700 leading-relaxed">
+            {post.content.split('\n').map((paragraph: string, index: number) => (
+              <p key={index} className="mb-6 last:mb-0">
+                {paragraph}
+              </p>
+            ))}
           </div>
+
+          {/* Comments */}
+          <CommentSystem postId={post.id} userClearance={userClearance} />
         </article>
       </div>
     </div>
