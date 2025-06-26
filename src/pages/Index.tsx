@@ -1,13 +1,28 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+
+import React, { useState } from 'react';
+import PasswordGate from '../components/PasswordGate';
+import CosmicBlog from '../components/CosmicBlog';
 
 const Index = () => {
+  const [userClearance, setUserClearance] = useState<'admin' | 'friend' | 'public' | null>(null);
+
+  const handleAccess = (clearanceLevel: 'admin' | 'friend' | 'public') => {
+    setUserClearance(clearanceLevel);
+  };
+
+  const handleLogout = () => {
+    setUserClearance(null);
+  };
+
+  if (!userClearance) {
+    return <PasswordGate onAccess={handleAccess} />;
+  }
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
-    </div>
+    <CosmicBlog 
+      userClearance={userClearance} 
+      onLogout={handleLogout}
+    />
   );
 };
 
