@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Lock, Eye, EyeOff } from 'lucide-react';
+import { Lock, Eye, EyeOff, Zap } from 'lucide-react';
 
 interface PasswordGateProps {
   onAccess: (clearanceLevel: 'admin' | 'friend' | 'public') => void;
@@ -15,6 +15,7 @@ const PasswordGate: React.FC<PasswordGateProps> = ({ onAccess }) => {
     e.preventDefault();
     setIsLoading(true);
     
+    // Simulate authentication delay
     await new Promise(resolve => setTimeout(resolve, 800));
     
     const passwordMap: Record<string, 'admin' | 'friend' | 'public'> = {
@@ -30,35 +31,35 @@ const PasswordGate: React.FC<PasswordGateProps> = ({ onAccess }) => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 bg-white">
-      <div className="w-full max-w-sm animate-fade-in">
+    <div className="min-h-screen flex items-center justify-center p-6">
+      <div className="w-full max-w-md">
         {/* Header */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gray-100 mb-4">
-            <Lock className="w-6 h-6 text-gray-600" />
+        <div className="text-center mb-12">
+          <div className="inline-flex items-center justify-center w-20 h-20 glass-panel rounded-2xl mb-6 animate-glow">
+            <Zap className="w-10 h-10 neon-accent" />
           </div>
-          <h1 className="text-2xl font-semibold text-gray-900 mb-2">
-            Welcome
+          <h1 className="text-3xl font-bold futuristic-heading mb-4">
+            Access Terminal
           </h1>
-          <p className="text-gray-600">
-            Enter your access key to continue
+          <p className="secondary-text text-lg">
+            Enter your clearance credentials
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-8">
           <div className="relative">
             <input
               type={showPassword ? 'text' : 'password'}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Access key"
-              className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition-all"
+              placeholder="Clearance code"
+              className="w-full px-6 py-4 glass-card rounded-2xl focus:neon-border focus-ring transition-all text-lg font-mono"
               disabled={isLoading}
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+              className="absolute right-4 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors p-1 rounded-lg"
               disabled={isLoading}
             >
               {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
@@ -68,27 +69,44 @@ const PasswordGate: React.FC<PasswordGateProps> = ({ onAccess }) => {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full py-3 bg-gray-900 text-white font-medium rounded-lg hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors focus-ring"
+            className="w-full py-4 accent-button rounded-2xl text-lg font-semibold hover-lift disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
           >
             {isLoading ? (
-              <div className="flex items-center justify-center space-x-2">
-                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              <div className="flex items-center justify-center space-x-3">
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                 <span>Authenticating...</span>
               </div>
             ) : (
-              'Continue'
+              <div className="flex items-center justify-center space-x-2">
+                <Lock className="w-5 h-5" />
+                <span>Access System</span>
+              </div>
             )}
           </button>
         </form>
 
         {/* Demo credentials */}
-        <div className="mt-8 p-4 bg-gray-50 rounded-lg">
-          <p className="text-xs text-gray-600 text-center mb-3">Demo credentials</p>
-          <div className="text-xs text-gray-500 space-y-1">
-            <p><code className="bg-white px-2 py-1 rounded font-mono text-xs">cosmic-admin-2024</code> → Admin</p>
-            <p><code className="bg-white px-2 py-1 rounded font-mono text-xs">starlight-friend</code> → Friend</p>
-            <p><code className="bg-white px-2 py-1 rounded font-mono text-xs">nebula-guest</code> → Public</p>
-            <p className="text-center pt-2 text-gray-400">or leave blank for public access</p>
+        <div className="mt-12 glass-panel rounded-2xl p-6">
+          <div className="flex items-center space-x-2 mb-4">
+            <Zap className="w-4 h-4 neon-accent" />
+            <p className="text-sm font-medium secondary-text">Demo Credentials</p>
+          </div>
+          <div className="space-y-3 text-sm muted-text">
+            <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
+              <code className="font-mono text-slate-800">cosmic-admin-2024</code>
+              <span className="text-xs font-medium text-red-600 bg-red-100 px-2 py-1 rounded-full">Admin</span>
+            </div>
+            <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
+              <code className="font-mono text-slate-800">starlight-friend</code>
+              <span className="text-xs font-medium text-amber-600 bg-amber-100 px-2 py-1 rounded-full">Friend</span>
+            </div>
+            <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
+              <code className="font-mono text-slate-800">nebula-guest</code>
+              <span className="text-xs font-medium text-blue-600 bg-blue-100 px-2 py-1 rounded-full">Public</span>
+            </div>
+            <p className="text-center pt-3 text-xs muted-text">
+              Or leave blank for public access
+            </p>
           </div>
         </div>
       </div>

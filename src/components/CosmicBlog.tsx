@@ -1,7 +1,8 @@
+
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit, LogOut, Settings } from 'lucide-react';
+import { Plus, Edit, LogOut, PenTool } from 'lucide-react';
 import BlogPost from './BlogPost';
-import AdminPanel from './AdminPanel';
+import MarkdownEditor from './MarkdownEditor';
 
 interface CosmicBlogProps {
   userClearance: 'admin' | 'friend' | 'public';
@@ -11,15 +12,32 @@ interface CosmicBlogProps {
 const CosmicBlog: React.FC<CosmicBlogProps> = ({ userClearance, onLogout }) => {
   const [posts, setPosts] = useState<any[]>([]);
   const [isEditMode, setIsEditMode] = useState(false);
+  const [showEditor, setShowEditor] = useState(false);
   const [editingPost, setEditingPost] = useState<any>(null);
-  const [showAdminPanel, setShowAdminPanel] = useState(false);
+
+  const canEdit = userClearance === 'admin';
 
   useEffect(() => {
     const demoPosts = [
       {
         id: '1',
         title: 'Welcome to the Digital Journal',
-        content: 'A clean, minimal space for thoughts and ideas. This platform respects different levels of access while maintaining a beautiful, distraction-free reading experience.',
+        content: `# Welcome to the Digital Journal
+
+A clean, minimal space for thoughts and ideas. This platform respects different levels of access while maintaining a beautiful, distraction-free reading experience.
+
+**Key Features:**
+- Multi-tier access control
+- Clean, modern interface
+- Markdown support
+
+:::friend
+Thank you for being a trusted friend! You have access to special content.
+:::
+
+:::admin-only
+This is admin-only content with sensitive information.
+:::`,
         author: 'Admin',
         date: new Date().toISOString(),
         clearanceLevel: 'public' as const
@@ -27,7 +45,19 @@ const CosmicBlog: React.FC<CosmicBlogProps> = ({ userClearance, onLogout }) => {
       {
         id: '2',
         title: 'Building Better Digital Experiences',
-        content: 'Design is not just what it looks like and feels like. Design is how it works. This principle guides every decision in creating meaningful digital experiences that serve users first.',
+        content: `# Building Better Digital Experiences
+
+Design is not just what it looks like and feels like. **Design is how it works.** This principle guides every decision in creating meaningful digital experiences that serve users first.
+
+## Key Principles
+
+- *Simplicity* over complexity
+- **Functionality** over aesthetics
+- User needs over business requirements
+
+:::friend
+As someone in our inner circle, you understand the importance of user-centered design.
+:::`,
         author: 'Content Team',
         date: new Date(Date.now() - 86400000).toISOString(),
         clearanceLevel: 'friend' as const
@@ -35,7 +65,22 @@ const CosmicBlog: React.FC<CosmicBlogProps> = ({ userClearance, onLogout }) => {
       {
         id: '3',
         title: 'System Architecture Notes',
-        content: 'Internal documentation on the current system architecture. Performance metrics show excellent user engagement across all clearance levels with minimal overhead.',
+        content: `# System Architecture Notes
+
+Internal documentation on the current system architecture. Performance metrics show excellent user engagement across all clearance levels with minimal overhead.
+
+## Technical Stack
+
+- **Frontend**: React with TypeScript
+- **Styling**: Tailwind CSS
+- **Storage**: LocalStorage (demo)
+
+:::admin-only
+**Sensitive Information:**
+- Database credentials stored in environment variables
+- API keys rotated monthly
+- Security audit scheduled for next quarter
+:::`,
         author: 'System Admin',
         date: new Date(Date.now() - 172800000).toISOString(),
         clearanceLevel: 'admin' as const
@@ -56,19 +101,38 @@ const CosmicBlog: React.FC<CosmicBlogProps> = ({ userClearance, onLogout }) => {
     localStorage.setItem('cosmic-blog-posts', JSON.stringify(updatedPosts));
   };
 
-  const handleCreatePost = (newPost: any) => {
+  const handleCreatePost = (content: string, title: string, clearanceLevel: 'admin' | 'friend' | 'public') => {
+    const newPost = {
+      id: Date.now().toString(),
+      title,
+      content,
+      clearanceLevel,
+      author: 'Administrator',
+      date: new Date().toISOString()
+    };
+    
     const updatedPosts = [newPost, ...posts];
     savePosts(updatedPosts);
-    setShowAdminPanel(false);
+    setShowEditor(false);
+    setEditingPost(null);
   };
 
-  const handleUpdatePost = (updatedPost: any) => {
+  const handleUpdatePost = (content: string, title: string, clearanceLevel: 'admin' | 'friend' | 'public') => {
+    if (!editingPost) return;
+    
+    const updatedPost = {
+      ...editingPost,
+      title,
+      content,
+      clearanceLevel
+    };
+    
     const updatedPosts = posts.map(post => 
-      post.id === updatedPost.id ? updatedPost : post
+      post.id === editingPost.id ? updatedPost : post
     );
     savePosts(updatedPosts);
     setEditingPost(null);
-    setShowAdminPanel(false);
+    setShowEditor(false);
   };
 
   const handleDeletePost = (postId: string) => {
@@ -80,37 +144,44 @@ const CosmicBlog: React.FC<CosmicBlogProps> = ({ userClearance, onLogout }) => {
 
   const handleEditPost = (post: any) => {
     setEditingPost(post);
-    setShowAdminPanel(true);
+    setShowEditor(true);
+  };
+
+  const handleCancelEditor = () => {
+    setShowEditor(false);
+    setEditingPost(null);
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="max-w-2xl mx-auto px-6 py-12">
+    <div className="min-h-screen">
+      <div className="max-w-4xl mx-auto px-6 py-12">
         {/* Header */}
-        <header className="mb-16 animate-fade-in">
+        <header className="mb-16">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h1 className="text-3xl font-semibold text-gray-900 mb-2">
+              <h1 className="text-4xl font-bold futuristic-heading mb-3">
                 Digital Journal
               </h1>
-              <p className="text-gray-600">
+              <p className="secondary-text text-lg">
                 Thoughts, ideas, and insights
               </p>
             </div>
             
             <div className="flex items-center space-x-3">
-              <span className="text-sm text-gray-500 px-3 py-1 bg-gray-100 rounded-full">
-                {userClearance}
-              </span>
+              <div className="glass-card px-4 py-2 rounded-full">
+                <span className="text-sm font-medium neon-accent">
+                  {userClearance}
+                </span>
+              </div>
               
-              {userClearance === 'admin' && (
+              {canEdit && (
                 <div className="flex space-x-2">
                   <button
                     onClick={() => setIsEditMode(!isEditMode)}
-                    className={`p-2 rounded-lg transition-colors focus-ring ${
+                    className={`p-3 rounded-xl transition-all ${
                       isEditMode 
-                        ? 'bg-gray-900 text-white' 
-                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                        ? 'accent-button' 
+                        : 'futuristic-button hover-lift'
                     }`}
                   >
                     <Edit className="w-4 h-4" />
@@ -118,19 +189,19 @@ const CosmicBlog: React.FC<CosmicBlogProps> = ({ userClearance, onLogout }) => {
                   
                   <button
                     onClick={() => {
-                      setShowAdminPanel(!showAdminPanel);
+                      setShowEditor(!showEditor);
                       setEditingPost(null);
                     }}
-                    className="p-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors focus-ring"
+                    className="accent-button p-3 rounded-xl hover-lift"
                   >
-                    <Plus className="w-4 h-4" />
+                    <PenTool className="w-4 h-4" />
                   </button>
                 </div>
               )}
               
               <button
                 onClick={onLogout}
-                className="p-2 text-gray-400 hover:text-gray-600 rounded-lg transition-colors focus-ring"
+                className="p-3 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-all hover-lift"
               >
                 <LogOut className="w-4 h-4" />
               </button>
@@ -138,33 +209,30 @@ const CosmicBlog: React.FC<CosmicBlogProps> = ({ userClearance, onLogout }) => {
           </div>
         </header>
 
-        {/* Admin Panel */}
-        {showAdminPanel && userClearance === 'admin' && (
-          <div className="mb-12 animate-scale-in">
-            <AdminPanel
-              onCreatePost={handleCreatePost}
-              onUpdatePost={handleUpdatePost}
-              editingPost={editingPost}
-              onCancelEdit={() => {
-                setEditingPost(null);
-                setShowAdminPanel(false);
-              }}
-            />
-          </div>
+        {/* Markdown Editor */}
+        {showEditor && canEdit && (
+          <MarkdownEditor
+            initialContent={editingPost?.content}
+            onSave={editingPost ? handleUpdatePost : handleCreatePost}
+            onCancel={handleCancelEditor}
+            isEditing={!!editingPost}
+          />
         )}
 
         {/* Blog Posts */}
-        <div className="space-y-12">
+        <div className="space-y-8">
           {posts.length === 0 ? (
-            <div className="text-center py-16">
-              <p className="text-gray-500">No posts yet</p>
+            <div className="text-center py-24">
+              <div className="glass-panel rounded-2xl p-12 max-w-md mx-auto">
+                <p className="muted-text text-lg">No posts yet</p>
+              </div>
             </div>
           ) : (
             posts.map((post, index) => (
               <div
                 key={post.id}
-                className="animate-fade-in"
-                style={{ animationDelay: `${index * 0.05}s` }}
+                className="hover-lift"
+                style={{ animationDelay: `${index * 0.1}s` }}
               >
                 <BlogPost
                   post={post}
@@ -179,13 +247,15 @@ const CosmicBlog: React.FC<CosmicBlogProps> = ({ userClearance, onLogout }) => {
         </div>
 
         {/* Footer */}
-        <footer className="mt-24 pt-8 border-t border-gray-200 text-center">
-          <p className="text-sm text-gray-500">
-            {posts.filter(post => {
-              const clearanceLevels = { public: 0, friend: 1, admin: 2 };
-              return clearanceLevels[userClearance] >= clearanceLevels[post.clearanceLevel];
-            }).length} posts accessible
-          </p>
+        <footer className="mt-24 pt-8 border-t border-slate-200/50 text-center">
+          <div className="glass-card rounded-xl px-6 py-4 inline-block">
+            <p className="text-sm muted-text">
+              {posts.filter(post => {
+                const clearanceLevels = { public: 0, friend: 1, admin: 2 };
+                return clearanceLevels[userClearance] >= clearanceLevels[post.clearanceLevel];
+              }).length} posts accessible
+            </p>
+          </div>
         </footer>
       </div>
     </div>

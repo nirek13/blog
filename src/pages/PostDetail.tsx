@@ -4,6 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Lock, Eye, Star } from 'lucide-react';
 import PasswordGate from '../components/PasswordGate';
 import CommentSystem from '../components/CommentSystem';
+import { renderMarkdown } from '../utils/markdownRenderer';
 
 const PostDetail = () => {
   const { slug } = useParams();
@@ -37,7 +38,15 @@ const PostDetail = () => {
     switch (level) {
       case 'admin': return <Lock className="w-4 h-4 text-red-500" />;
       case 'friend': return <Star className="w-4 h-4 text-amber-500" />;
-      default: return <Eye className="w-4 h-4 text-blue-500" />;
+      default: return <Eye className="w-4 h-4 neon-accent" />;
+    }
+  };
+
+  const getClearanceColor = (level: string) => {
+    switch (level) {
+      case 'admin': return 'text-red-500 bg-red-50 border-red-200';
+      case 'friend': return 'text-amber-600 bg-amber-50 border-amber-200';
+      default: return 'text-blue-500 bg-blue-50 border-blue-200';
     }
   };
 
@@ -47,12 +56,12 @@ const PostDetail = () => {
 
   if (!post) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-semibold text-gray-900 mb-4">Post not found</h1>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="glass-panel rounded-2xl p-12 text-center max-w-md">
+          <h1 className="text-2xl font-bold futuristic-heading mb-4">Post not found</h1>
           <button
             onClick={() => navigate('/')}
-            className="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors focus-ring"
+            className="accent-button px-6 py-3 rounded-xl hover-lift"
           >
             Go back home
           </button>
@@ -63,14 +72,14 @@ const PostDetail = () => {
 
   if (!canView()) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="max-w-md mx-auto p-8 text-center">
-          <Lock className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-          <h1 className="text-xl font-semibold text-gray-900 mb-2">Access Restricted</h1>
-          <p className="text-gray-600 mb-6">You don't have sufficient clearance to view this content.</p>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="glass-panel rounded-2xl p-12 text-center max-w-md">
+          <Lock className="w-16 h-16 text-slate-400 mx-auto mb-6" />
+          <h1 className="text-2xl font-bold futuristic-heading mb-4">Access Restricted</h1>
+          <p className="secondary-text mb-8">You don't have sufficient clearance to view this content.</p>
           <button
             onClick={() => navigate('/')}
-            className="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors focus-ring"
+            className="accent-button px-6 py-3 rounded-xl hover-lift"
           >
             Go back home
           </button>
@@ -80,35 +89,33 @@ const PostDetail = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="max-w-2xl mx-auto px-6 py-12">
+    <div className="min-h-screen">
+      <div className="max-w-4xl mx-auto px-6 py-12">
         {/* Header */}
-        <div className="mb-8">
+        <div className="mb-12">
           <button
             onClick={() => navigate('/')}
-            className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors mb-8 focus-ring rounded-lg p-1 -ml-1"
+            className="flex items-center space-x-2 text-slate-600 hover:text-slate-900 transition-colors mb-8 hover-lift p-2 -ml-2 rounded-xl"
           >
-            <ArrowLeft className="w-4 h-4" />
-            <span className="text-sm">Back</span>
+            <ArrowLeft className="w-5 h-5" />
+            <span className="font-medium">Back to posts</span>
           </button>
         </div>
 
         {/* Post Content */}
-        <article className="animate-fade-in">
+        <article className="glass-card rounded-2xl p-8 lg:p-12">
           {/* Post Meta */}
-          <div className="flex items-center space-x-2 mb-6">
-            {getClearanceIcon(post.clearanceLevel)}
-            <span className="text-xs text-gray-500 uppercase tracking-wide">
-              {post.clearanceLevel}
-            </span>
+          <div className="flex items-center space-x-3 mb-8">
+            <div className={`flex items-center space-x-2 px-4 py-2 rounded-full border text-sm font-medium ${getClearanceColor(post.clearanceLevel)}`}>
+              {getClearanceIcon(post.clearanceLevel)}
+              <span className="uppercase tracking-wide">
+                {post.clearanceLevel}
+              </span>
+            </div>
           </div>
           
-          <h1 className="text-3xl font-semibold text-gray-900 mb-6 leading-tight">
-            {post.title}
-          </h1>
-          
-          <div className="flex items-center space-x-4 text-sm text-gray-500 mb-8">
-            <span>{post.author}</span>
+          <div className="flex items-center space-x-4 text-sm secondary-text mb-12">
+            <span className="font-medium text-slate-700">{post.author}</span>
             <span>•</span>
             <time>{new Date(post.date).toLocaleDateString('en-US', { 
               year: 'numeric', 
@@ -118,12 +125,8 @@ const PostDetail = () => {
           </div>
 
           {/* Post Body */}
-          <div className="prose prose-lg max-w-none text-gray-700 leading-relaxed">
-            {post.content.split('\n').map((paragraph: string, index: number) => (
-              <p key={index} className="mb-6 last:mb-0">
-                {paragraph}
-              </p>
-            ))}
+          <div className="mb-16">
+            {renderMarkdown(post.content, userClearance)}
           </div>
 
           {/* Comments */}
